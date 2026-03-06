@@ -1,6 +1,6 @@
 import {
   BedrockRuntimeClient,
-  InvokeModelWithResponseStreamCommand
+  ConverseStreamCommand
 } from "@aws-sdk/client-bedrock-runtime";
 
 const client = new BedrockRuntimeClient({
@@ -18,27 +18,28 @@ export const handler = awslambda.streamifyResponse(
       }
     });
 
+    // Converse API requires content as an array of content blocks
+    const converseMessages = messages.map(({ role, content }) => ({
+      role,
+      content: [{ text: content }]
+    }));
+
     try {
       const response = await client.send(
-        new InvokeModelWithResponseStreamCommand({
-          modelId: "us.anthropic.claude-haiku-4-5-20251001-v1:0",
-          body: JSON.stringify({
-            anthropic_version: "bedrock-2023-05-31",
-            max_tokens: 1024,
-            system: "You are a helpful assistant.",
-            messages
-          })
+        new ConverseStreamCommand({
+          modelId: "amazon.nova-micro-v1:0",
+          messages: converseMessages,
+          system: [{ text: "You are a helpful assistant." }],
+          inferenceConfig: {
+            maxTokens: 1000,
+            temperature: 0.7
+          }
         })
       );
 
-      for await (const chunk of response.body) {
-        if (chunk.chunk) {
-          const parsed = JSON.parse(
-            new TextDecoder().decode(chunk.chunk.bytes)
-          );
-          if (parsed.type === "content_block_delta") {
-            stream.write(parsed.delta?.text ?? "");
-          }
+      for await (const chunk of response.stream) {
+        if (chunk.contentBlockDelta) {
+          stream.write(chunk.contentBlockDelta.delta?.text ?? "");
         }
       }
     } catch (err) {
