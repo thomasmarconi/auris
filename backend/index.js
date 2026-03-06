@@ -27,7 +27,7 @@ export const handler = awslambda.streamifyResponse(
     try {
       const response = await client.send(
         new ConverseStreamCommand({
-          modelId: "amazon.nova-micro-v1:0",
+          modelId: "us.amazon.nova-micro-v1:0",
           messages: converseMessages,
           system: [{ text: "You are a helpful assistant." }],
           inferenceConfig: {
