@@ -25,7 +25,7 @@ export default function ChatWindow() {
   };
 
   return (
-    <div className="flex flex-col h-[80vh] max-w-3xl mx-auto border border-gray-200 rounded-xl overflow-hidden">
+    <div className="flex flex-col flex-1 mx-auto w-full border border-gray-200 rounded-xl overflow-hidden">
       <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
         {state.messages.map((msg, i) => (
           <div
@@ -53,7 +53,7 @@ export default function ChatWindow() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Message Claude... (Enter to send, Shift+Enter for new line)"
+          placeholder="Heya! Let me help you find new music... (Enter to send, Shift+Enter for new line)"
           disabled={state.isLoading}
           rows={3}
           className="flex-1 px-3.5 py-2.5 border border-gray-200 rounded-lg resize-none text-sm font-[inherit] outline-none focus:border-blue-600"
