@@ -1,0 +1,29 @@
+service: aws-chat-app-backend
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: ${env:AWS_REGION, 'us-east-2'}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - bedrock:InvokeModelWithResponseStream
+          Resource: '*'
+
+functions:
+  chat:
+    handler: index.handler
+    url:
+      cors:
+        allowedOrigins:
+          - '*'
+        allowedHeaders:
+          - Content-Type
+        allowedMethods:
+          - POST
+          - OPTIONS
+      invokeMode: RESPONSE_STREAM
